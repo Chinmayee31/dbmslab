@@ -1,0 +1,118 @@
+SQL> SELECT * FROM STUNT;
+
+      SNUM SNAME                MAJOR      LEVEELS                     AGE
+---------- -------------------- ---------- -------------------- ----------
+         1 ANDY                 CSE        JR                           18
+         2 HELEN                ARTS       JR                           18
+         3 BOB                  PSYCHOLOGY GR                           19
+         4 PHAM                 HISTORY    SR                           22
+         5 ZOLA                 CSE        SR                           21
+         6 ABHI                 CSE        JR                           18
+         7 TARA                 ARTS       JR                           17
+
+7 rows selected.
+
+SQL> SELECT * FROM EN;
+
+      SNUM CNAME
+---------- --------------------
+         1 CS2
+         1 A2
+         2 A2
+         2 P1
+         3 P1
+         3 H4
+         4 H8
+         5 CS3
+         5 H8
+         6 CS2
+
+10 rows selected.
+
+SQL> SELECT * FROM FA;
+
+       FID FNAME                    DEPTID
+---------- -------------------- ----------
+        22 KERA                         88
+        23 NIALL                        77
+        24 RAVI                         33
+        27 LOU                          66
+        31 JANE                         44
+        34 PAYNE                        55
+        36 RAKESH                       22
+
+7 rows selected.
+
+SQL> SELECT * FROM CLA;
+
+CNAME                MEETS                ROOM                        FID
+-------------------- -------------------- -------------------- ----------
+H8                   12;00                R1                           34
+CS3                  12;00                R2                           23
+CS2                  2;00                 R3                           24
+P1                   9;00                 R4                           27
+A2                   9;00                 R5                           36
+A6                   10;00                R6                           31
+P2                   8;00                 R6                           22
+H7                   5;00                 R6                           34
+H4                   4;00                 R6                           31
+CS9                  2;00                 R6                           22
+
+
+queries
+
+1)
+ SELECT DISTINCT S.SNUM,S.SNAME
+ FROM STUNT S,CLA C,EN E,FA F
+ WHERE S.SNUM=E.SNUM AND
+ E.CNAME=C.CNAME AND
+ C.FID=F.FID AND
+ F.FNAME='RAKESH' AND
+ S.LEVEELS='JR'
+ ORDER BY SNUM;
+ 
+ 
+ 2)
+ 
+  SELECT MAX(S.AGE) AS AGE
+  FROM STUNT S
+  WHERE(S.MAJOR='HISTORY') OR
+  S.SNUM IN (SELECT E.SNUM
+  FROM CLA C,EN E,FA F
+  WHERE E.CNAME=C.CNAME AND
+  C.FID=F.FID and F.FNAME='RAVI');
+  
+  
+3)  
+ SELECT DISTINCT S.SNAME
+    FROM STUNT S
+    WHERE S.SNUM IN ( SELECT E1.SNUM
+                      FROM EN E1,EN E2,CLA C1,CLA C2
+                      WHERE E1.SNUM=E2.SNUM AND
+                      E1.CNAME<>E2.CNAME AND
+                      E1.CNAME=C1.CNAME AND 
+                      E2.CNAME=C2.CNAME AND 
+                      C1.MEETS=C2.MEETS);
+                      
+                      
+4)
+ SELECT DISTINCT F.FNAME,COUNT(*) AS COURSECOUNT
+    FROM CLA C, FA F
+    WHERE C.FID NOT IN ( SELECT FID
+                         FROM CLA
+                         WHERE ROOM IN ( SELECT ROOM
+                                         FROM CLA
+                                         WHERE ROOM!='R6')) AND
+                                  C.FID=F.FID
+                                   GROUP BY F.FNAME;
+
+5)
+CREATE VIEW ENROLL_NMAES AS 
+SELECT S.SNAME,E.CNAME  FROM STUNT S,EN E
+WHERE S.SNUM=E.SNUM;
+
+
+
+
+
+
